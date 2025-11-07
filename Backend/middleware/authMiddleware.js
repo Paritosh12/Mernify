@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User from "../models/userModel.js";
+import User from "../models/User.js";
 
 const protect = async (req, res, next) => {
   let token;
@@ -13,6 +13,7 @@ const protect = async (req, res, next) => {
       req.user = await User.findById(decoded.id).select("-password");
       next();
     } catch (error) {
+      console.error("Error in protect middleware:", error);
       return res.status(401).json({ message: "Not authorized, token failed" });
     }
   }

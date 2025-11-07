@@ -1,6 +1,6 @@
-import Workspace from "../models/workspaceModel.js";
-import Prompt from "../models/promptModel.js";
-import User from "../../../Backend/models/User.js";
+import Workspace from "../models/Workspace.js";
+import Prompt from "../models/Prompt.js";
+import User from "../models/User.js"
 
 // POST /api/workspaces
 export const createWorkspace = async (req, res) => {

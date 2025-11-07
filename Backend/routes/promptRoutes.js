@@ -7,7 +7,7 @@ import {
     approvePromptUpdate,
     rejectPromptUpdate
 } from "../controllers/promptController.js"
-
+const router=express.Router();
 router.route("/")
   .get(getPrompts)
   .post(protect, addPrompt);

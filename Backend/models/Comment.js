@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Prompt from "../models/Prompt"
+import Prompt from "../models/Prompt.js"
 export const commentSchema=new mongoose.Schema({
     
     promptId:{type:mongoose.Schema.Types.ObjectId,ref:"Prompt"},
