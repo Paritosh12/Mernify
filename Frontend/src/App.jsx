@@ -6,6 +6,15 @@ import Dashboard from './pages/Dashboard';
 import LibraryView from './pages/LibraryView';
 import PromptDetailPage from './pages/PromptDetailPage'; // New Import
 import ReviewRequestModal from './components/Modals/ReviewRequestModal';
+import AuthView from './pages/AuthView';
+import AddWorkspaceModal from './components/Modals/AddWorkspaceModal';
+
+const initialWorkspaces = [
+    { id: 1, name: "Dev Team Prompts" },
+    { id: 2, name: "Marketing Campaigns" },
+    { id: 3, name: "Hackathon Squad" },
+];
+
 
 const App = () => {
     const [currentPage, setCurrentPage] = useState('dashboard');
@@ -14,6 +23,16 @@ const App = () => {
     const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(1);
     const [viewingPromptId, setViewingPromptId] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+
+    const [isAuthenticated, setIsAuthenticated] = useState(false); 
+    const [workspaces, setWorkspaces] = useState(initialWorkspaces);
+    const [isAddWorkspaceModalOpen, setIsAddWorkspaceModalOpen] = useState(false);
+
+
+    const handleAuthSuccess = () => {
+        setIsAuthenticated(true);
+        setCurrentPage('dashboard');
+    };
     const handlePageChange = (page) => {
         
             if (page !== currentPage) {
@@ -45,6 +64,15 @@ const App = () => {
       setSelectedWorkspaceId(workspaceId);
       setCurrentPage('library');
     };
+
+    const handleAddWorkspace = (name) => {
+        const newWorkspace = {
+            id: Date.now(), // Simple unique ID
+            name: name,
+        };
+        setWorkspaces(prev => [...prev, newWorkspace]);
+    };
+
 
     const renderPage = () => {
         if (viewingPromptId) {
@@ -79,6 +107,7 @@ const App = () => {
                     onPromptSelect={handlePromptSelect} 
                     selectedWorkspaceId={selectedWorkspaceId}
                     searchQuery={searchQuery}
+                    workspaces={workspaces}
                 />;
             case 'prompt-detail': // <--- NEW CASE ADDED HERE
             return <PromptDetailPage 
@@ -92,26 +121,42 @@ const App = () => {
     };
 
     return (
-        <div id="app" className="flex h-screen overflow-hidden bg-bg-primary font-inter">
-            <Sidebar 
-                currentPage={currentPage} 
-                setCurrentPage={handlePageChange}
-                setSelectedWorkspaceId={setSelectedWorkspaceId} // Pass setter for dropdown
-            />
+        <div id="app" className="font-inter">
+            {!isAuthenticated ? (
+                <AuthView onAuthSuccess={handleAuthSuccess} />
+            ) : (
+                <div className="flex h-screen overflow-hidden bg-bg-primary">
+                    <Sidebar 
+                        currentPage={currentPage} 
+                        setCurrentPage={handlePageChange}
+                        setSelectedWorkspaceId={setSelectedWorkspaceId} 
+                        //new
+                        workspaces={workspaces}
+                        onOpenAddWorkspaceModal={() => setIsAddWorkspaceModalOpen(true)}
+                    />
 
-            <main id="main-content" className="flex-1 p-8 overflow-y-auto">
-                <Header currentPage={currentPage}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}/>
-                <div id="page-content" className="w-full">
-                    {renderPage()}
+                    <main id="main-content" className="flex-1 p-8 overflow-y-auto">
+                        <Header 
+                            currentPage={currentPage} 
+                            searchQuery={searchQuery}
+                            setSearchQuery={setSearchQuery}
+                        />
+                        <div id="page-content" className="w-full">
+                            {renderPage()}
+                        </div>
+                    </main>
+                    
+                    <ReviewRequestModal 
+                        isOpen={isModalOpen} 
+                        onClose={() => {setIsModalOpen(false);}} 
+                    />
+                    <AddWorkspaceModal 
+                        isOpen={isAddWorkspaceModalOpen}
+                        onClose={() => setIsAddWorkspaceModalOpen(false)}
+                        onSave={handleAddWorkspace}
+                    />
                 </div>
-            </main>
-            
-            <ReviewRequestModal 
-                isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} 
-            />
+            )}
         </div>
     );
 };

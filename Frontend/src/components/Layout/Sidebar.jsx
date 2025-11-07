@@ -1,12 +1,5 @@
-// src/components/Layout/Sidebar.jsx
 import { Zap, Home, HardHat, FileText, Compass, Plus, ChevronDown, ChevronRight } from 'lucide-react';
 import React, { useState } from 'react';
-
-const mockWorkspaces = [
-    { id: 1, name: "Dev Team Prompts" },
-    { id: 2, name: "Marketing Campaigns" },
-    { id: 3, name: "Hackathon Squad" },
-];
 
 const NavItem = ({ Icon, name, isActive, onClick, isDropdown = false, isOpen = false }) => (
     <a 
@@ -24,12 +17,14 @@ const NavItem = ({ Icon, name, isActive, onClick, isDropdown = false, isOpen = f
     </a>
 );
 
-const Sidebar = ({ currentPage, setCurrentPage, setSelectedWorkspaceId }) => {
+// UPDATED: Accepts workspaces and new modal handler
+const Sidebar = ({ currentPage, setCurrentPage, setSelectedWorkspaceId, workspaces, onOpenAddWorkspaceModal }) => {
     const [isWorkspaceOpen, setIsWorkspaceOpen] = useState(false);
 
     const handleWorkspaceSelect = (id) => {
         setSelectedWorkspaceId(id); // Update selected workspace state
         setCurrentPage('library'); // Navigate to the library view
+        setIsWorkspaceOpen(false); // Close dropdown
     };
 
     return (
@@ -54,7 +49,8 @@ const Sidebar = ({ currentPage, setCurrentPage, setSelectedWorkspaceId }) => {
                     {/* Workspace Dropdown Content */}
                     {isWorkspaceOpen && (
                         <div className="pl-6 space-y-1">
-                            {mockWorkspaces.map(ws => (
+                            {/* DYNAMICALLY RENDER WORKSPACES */}
+                            {workspaces.map(ws => (
                                 <a 
                                     key={ws.id}
                                     href="#" 
@@ -68,11 +64,15 @@ const Sidebar = ({ currentPage, setCurrentPage, setSelectedWorkspaceId }) => {
                     )}
                     
                     <NavItem Icon={FileText} name="Requests" isActive={currentPage === 'requests'} onClick={() => setCurrentPage('requests')} />
-                    <NavItem Icon={Compass} name="Explore" isActive={currentPage === 'explore'} onClick={() => alert('Explore clicked')} />
+                    <NavItem Icon={Compass} name="Explore" isActive={currentPage === 'explore'} onClick={() => setCurrentPage('explore')} />
                 </nav>
             </div>
             <div className="mt-8">
-                <button className="flex items-center p-3 rounded-lg text-white hover:bg-zinc-800 transition w-full text-sm">
+                {/* ADD WORKSPACE BUTTON TRIGGERS MODAL */}
+                <button 
+                    className="flex items-center p-3 rounded-lg text-white hover:bg-zinc-800 transition w-full text-sm"
+                    onClick={onOpenAddWorkspaceModal}
+                >
                     <Plus className="mr-3 w-5 h-5" /> Add Workspace
                 </button>
                 <div className="flex items-center justify-between p-3 mt-4 bg-surface-secondary rounded-xl">
