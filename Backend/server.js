@@ -10,6 +10,10 @@ import workspaceRoutes from "./routes/workspaceRoutes.js";
 import promptRoutes from "./routes/promptRoutes.js";
 import commentRoutes from "./routes/commentRoutes.js";
 
+import { getGlobalStats } from "./controllers/generalController.js";
+
+
+
 dotenv.config();
 const app = express();
 connectDB();
@@ -25,6 +29,9 @@ app.use("/api/users", userRoutes);
 app.use("/api/workspaces", workspaceRoutes);
 app.use("/api/prompts", promptRoutes);
 app.use("/api/comments", commentRoutes);
+
+
+app.get("/api/stats", getGlobalStats);
 
 app.use((err, req, res, next) => {
   console.error("❌ Server Error:", err.stack);

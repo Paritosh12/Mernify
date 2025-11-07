@@ -68,3 +68,35 @@ export const addPromptToWorkspace = async (req, res) => {
     res.status(500).json({ message: "Error adding prompt", error: error.message });
   }
 };
+
+
+export const getAllWorkspacesWithPromptCount = async (req, res) => {
+  try {
+    const workspaces = await Workspace.aggregate([
+      {
+        $lookup: {
+          from: "prompts", // The MongoDB collection name (usually plural lowercase)
+          localField: "_id",
+          foreignField: "workspaceId",
+          as: "promptsData",
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          createdBy: 1,
+          promptCount: { $size: "$promptsData" }, 
+        },
+      },
+      {
+          $sort: { promptCount: -1 }
+      }
+    ]);
+
+    res.json(workspaces);
+  } catch (error) {
+    console.error("Error fetching all workspaces with prompt count:", error);
+    res.status(500).json({ message: "Error fetching collaboration data", error: error.message });
+  }
+};

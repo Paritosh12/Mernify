@@ -1,0 +1,44 @@
+```
+└── 📁Frontend
+    └── 📁public
+        ├── vite.svg
+        ├── zap.svg
+    └── 📁src
+        └── 📁assets
+            ├── logo.png
+            ├── react.svg
+        └── 📁components
+            └── 📁Common
+                ├── Button.jsx
+                ├── PromptCard.jsx
+                ├── WorkspaceTile.jsx
+            └── 📁Dashboard
+                ├── ActiveWorkspaces.jsx
+                ├── PendingUpdatesPreview.jsx
+                ├── TrendingPrompts.jsx
+            └── 📁Layout
+                ├── Header.jsx
+                ├── Sidebar.jsx
+            └── 📁Modals
+                ├── AddpromptModal.jsx
+                ├── AddWorkspaceModal.jsx
+                ├── ReviewRequestModal.jsx
+        └── 📁pages
+            ├── AuthView.jsx
+            ├── Dashboard.jsx
+            ├── LibraryView.jsx
+            ├── PromptDetailPage.jsx
+        ├── App.css
+        ├── App.jsx
+        ├── copy.txt
+        ├── index.css
+        ├── main.jsx
+    ├── .gitignore
+    ├── eslint.config.js
+    ├── index.html
+    ├── package-lock.json
+    ├── package.json
+    ├── README.md
+    ├── tailwind.config.js
+    └── vite.config.js
+```

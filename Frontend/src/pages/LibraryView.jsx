@@ -65,7 +65,7 @@ const LibraryView = ({ onPromptSelect, selectedWorkspaceId }) => {
             </Button>
           </div>
 
-          {/* ✅ Open Add Prompt Modal */}
+          {/* Open Add Prompt Modal */}
           <Button
             variant="primary"
             onClick={() => setIsAddPromptModalOpen(true)}

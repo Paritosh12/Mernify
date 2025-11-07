@@ -3,21 +3,26 @@ import User from "../models/User.js";
 
 const protect = async (req, res, next) => {
   let token;
+  // ----------------------------------------------------------------------
+  // FIX 2: Check for the guaranteed lowercase 'authorization' header
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith("Bearer")
   ) {
     try {
-      token = req.headers.authorization.split(" ")[1];
+      // Access the token from the lowercase header field
+      token = req.headers.authorization.split(" ")[1]; 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = await User.findById(decoded.id).select("-password");
       next();
     } catch (error) {
       console.error("Error in protect middleware:", error);
-      return res.status(401).json({ message: "Not authorized, token failed" });
+      // This happens if the token exists but is invalid/expired
+      return res.status(401).json({ message: "Not authorized, token failed" }); 
     }
   }
 
+  // If the header wasn't present, the token is still undefined and this runs
   if (!token) return res.status(401).json({ message: "No token, not authorized" });
 };
 
