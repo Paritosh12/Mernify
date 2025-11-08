@@ -50,7 +50,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Internal Server Error" });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5050;
 app.listen(PORT, () =>
   console.log(`🚀 Server running on port ${PORT}`)
 );
@@ -59,4 +59,4 @@ const server = createServer(app);
 const io = new IOServer(server, {
   cors: { origin: process.env.FRONTEND_URL || "*", methods: ["GET","POST"] },
 });
-server.listen(process.env.PORT || 5000);
+server.listen(process.env.PORT || 5050);
