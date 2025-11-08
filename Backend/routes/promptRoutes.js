@@ -8,20 +8,25 @@ import {
   requestPromptUpdate,
   approvePromptUpdate,
   rejectPromptUpdate,
-  getPendingUpdates,   // new export
+  getPendingUpdates,
+  togglePromptUpvote,
+  getUserUpvotedPrompts
 } from "../controllers/promptController.js";
 
 const router = express.Router();
 
-// Public list and creation
 router.route("/")
   .get(getPrompts)
   .post(protect, addPrompt);
 
-// New: pending updates list (owner-only view)
+// endpoints for upvotes & user upvoted list (protected)
+router.get("/upvoted/me", protect, getUserUpvotedPrompts);
+router.put("/:id/upvote", protect, togglePromptUpvote);
+
+// pending updates list (owner-only view)
 router.get("/pending", protect, getPendingUpdates);
 
-// Single prompt (keep protected if you want only authenticated users to view details)
+// Single prompt
 router.route("/:id")
   .get(protect, getPromptById);
 

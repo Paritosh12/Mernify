@@ -4,6 +4,20 @@ import { ThumbsUp, Send, User } from "lucide-react";
 import Button from "../components/Common/Button";
 import api from "../api/axiosConfig"; // use shared axios config
 
+import { jwtDecode } from "jwt-decode";
+
+const getCurrentUserId = () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+    const decoded = jwtDecode(token);
+    return decoded.id;
+  } catch (err) {
+    console.error("Failed to decode token", err);
+    return null;
+  }
+};
+
 const PromptDetailPage = ({ prompt, goBackToLibrary }) => {
   // Local prompt state so we can re-fetch/upsert easily
   const [promptData, setPromptData] = useState(prompt || null);
@@ -24,12 +38,40 @@ const PromptDetailPage = ({ prompt, goBackToLibrary }) => {
         const { data } = await api.get(`/prompts/${prompt._id}`);
         setPromptData(data);
         setUpvoteCount(data?.upvotes || 0);
+      
+        // Determine whether current user has upvoted
+        const currentUserId = getCurrentUserId();
+      
+        // Case 1: backend returned upvotedBy array (preferred)
+        if (Array.isArray(data?.upvotedBy)) {
+          const has = data.upvotedBy.some(u => {
+            // elements might be ObjectId strings or populated objects
+            return (u === currentUserId) || (u?._id === currentUserId);
+          });
+          setHasUpvoted(Boolean(has));
+          return;
+        }
+      
+        // Case 2: fallback - call an endpoint that returns list of upvoted prompt IDs for this user
+        // (optional: implement GET /api/prompts/upvoted/me on backend)
+        if (currentUserId) {
+          try {
+            const upvResp = await api.get("/prompts/upvoted/me");
+            const upvotedIds = upvResp.data.items || [];
+            setHasUpvoted(upvotedIds.includes(data._id));
+          } catch (err) {
+            // fallback: assume not upvoted if we can't determine
+            setHasUpvoted(false);
+          }
+        } else {
+          setHasUpvoted(false);
+        }
       } catch (err) {
         console.error("Error fetching prompt details:", err);
-        // fall back to the passed prompt prop if fetch fails
         setPromptData(prompt);
       }
     };
+
 
     fetchPromptDetail();
   }, [prompt]);
@@ -60,18 +102,29 @@ const PromptDetailPage = ({ prompt, goBackToLibrary }) => {
 
   // Handle Upvote (UI-only here; you can call API to persist)
   const handleUpvote = async () => {
-    // Optimistic UI
+    if (!promptData?._id) return;
+
+    // optimistic
     setUpvoteCount((prev) => (hasUpvoted ? prev - 1 : prev + 1));
     setHasUpvoted((prev) => !prev);
 
-    // Optional: persist to server
     try {
-      await api.post(`/prompts/${promptData._id}/upvote`);
+      // toggle endpoint (use PUT; change to POST if your server uses POST)
+      const { data } = await api.put(`/prompts/${promptData._id}/upvote`);
+
+      // update state from server
+      setUpvoteCount(data.upvotes);
+      setHasUpvoted(Boolean(data.hasUpvoted));
+
+      // update promptData (so body of page and other fields reflect server)
+      setPromptData((prev) => ({ ...prev, upvotes: data.upvotes }));
     } catch (err) {
-      // revert on failure
-      console.error("Failed to persist upvote:", err);
+      console.error("Failed to persist upvote:", err.response?.data || err.message);
+      // revert optimistic
       setUpvoteCount((prev) => (hasUpvoted ? prev + 1 : prev - 1));
       setHasUpvoted((prev) => !prev);
+      // optional: show toast
+      alert(err.response?.data?.message || "Failed to upvote.");
     }
   };
 
