@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const base = import.meta.env.VITE_API_URL || "https://promptly-3gli.onrender.com/"; // uses Vite env var
+const base = process.env.VITE_API_URL; // uses Vite env var
 const api = axios.create({
   baseURL: base,
 });
